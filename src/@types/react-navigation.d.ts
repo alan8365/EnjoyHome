@@ -1,14 +1,16 @@
 import type { SceneName } from "~src/@types/SceneName";
 
 
+
 export type RootStackParamList = {
+    Welcome: undefined;
+    Login: undefined;
     Home: undefined;
     Profile: { name: string };
     Feed: { sort: 'latest' | 'top' } | undefined;
-    // [SceneName.Home]: NavigatorScreenParams<undefined>;
 };
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Profile', 'Home'>;
+export type Props = NativeStackScreenProps<RootStackParamList, 'Profile', 'Home'>;
 
 // TODO Figure out the purpose of this code
 declare global {
