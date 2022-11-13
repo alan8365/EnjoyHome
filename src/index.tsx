@@ -12,7 +12,6 @@ import { HomeScreen } from 'components/Home'
 
 import { AuthContext } from 'contexts/auth-context'
 
-
 export type RootStackParamList = {
     Welcome: undefined;
     Login: undefined;
@@ -22,9 +21,7 @@ export type RootStackParamList = {
     Feed: { sort: 'latest' | 'top' } | undefined;
 };
 
-
 const Stack = createNativeStackNavigator<RootStackParamList>();
-
 
 export default function App() {
     const [state, dispatch] = React.useReducer(
@@ -35,6 +32,7 @@ export default function App() {
                         ...prevState,
                         userToken: action.token,
                         isLoading: false,
+                        userNickname: action.userNickname
                     };
                 case 'SIGN_IN':
                     return {
@@ -60,16 +58,35 @@ export default function App() {
         }
     );
 
+    React.useEffect(() => {
+        // Fetch the token from storage then navigate to our appropriate place
+        const bootstrapAsync = async () => {
+            let userToken;
+            let userNickname;
+
+            try {
+                userToken = await AsyncStorage.getItem('user-token');
+                userNickname = await AsyncStorage.getItem(`@${userToken}-nickname`)
+            } catch (e) {
+                // Restoring token failed
+            }
+
+            dispatch({ type: 'RESTORE_TOKEN', token: userToken, userNickname: userNickname });
+        };
+
+        bootstrapAsync();
+    }, []);
+
+
     const authContext = {
         signIn: async (accountName: string, userType: 'parent' | 'child') => {
             const userNickname = await AsyncStorage.getItem(`@${accountName}-nickname`)
-            console.log(userNickname)
 
             dispatch({ type: 'SIGN_IN', token: accountName, userNickname: userNickname });
         },
         signOut: () => dispatch({ type: 'SIGN_OUT' }),
         signUp: async (accountName: string) => {
-            const userNickname = await AsyncStorage.getItem(`@${accountName}-nickName`)
+            const userNickname = await AsyncStorage.getItem(`@${accountName}-nickname`)
 
             dispatch({ type: 'SIGN_IN', token: accountName, userNickname: userNickname });
         },

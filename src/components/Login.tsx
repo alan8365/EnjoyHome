@@ -19,6 +19,10 @@ const login = async (accountName: string, password: string) => {
                 return true
             }
             else {
+            Alert.alert(
+                '抱歉',
+                '密碼錯誤'
+            )
             }
         } else {
             Alert.alert(
