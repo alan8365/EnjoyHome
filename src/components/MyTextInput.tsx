@@ -16,14 +16,13 @@ export const MyTextInput = (props: any) => {
 
             <TextInput
                 style={[styles.inputs, isFocused ? styles.focusedInput : styles.unFocusedInput]}
-                autoFocus={props.autoFocus}
-                onChangeText={props.onChangeText}
                 onFocus={() => {
                     setIsFocused(true)
                 }}
                 onBlur={() => {
                     setIsFocused(false)
                 }}
+                {...props}
             />
         </View>
     );

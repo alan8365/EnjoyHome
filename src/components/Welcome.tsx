@@ -14,7 +14,6 @@ export type RootStackParamList = {
 };
 
 
-
 type Props = NativeStackScreenProps<RootStackParamList>;
 
 export const WelcomeScreen = ({ route, navigation }: Props) => {

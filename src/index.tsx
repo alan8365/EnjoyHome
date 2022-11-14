@@ -2,7 +2,16 @@ import * as React from 'react';
 import { registerRootComponent } from "expo";
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {
+    createDrawerNavigator,
+    DrawerContentScrollView,
+    DrawerItemList,
+    DrawerItem,
+    DrawerContentComponentProps,
+} from '@react-navigation/drawer';
+
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { WelcomeScreen } from 'components/Welcome'
@@ -10,18 +19,33 @@ import { LoginScreen } from 'components/Login'
 import { RegisterScreen } from 'components/Register'
 import { HomeScreen } from 'components/Home'
 
+import { RootStackParamList } from 'components/Navigation'
+
+
 import { AuthContext } from 'contexts/auth-context'
 
-export type RootStackParamList = {
-    Welcome: undefined;
-    Login: undefined;
-    Register: undefined;
-    Home: undefined;
-    Profile: { name: string };
-    Feed: { sort: 'latest' | 'top' } | undefined;
-};
-
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const Drawer = createDrawerNavigator<RootStackParamList>();
+
+function CustomDrawerContent(props: DrawerContentComponentProps) {
+    const { signOut } = React.useContext(AuthContext);
+
+    return (
+        <DrawerContentScrollView {...props}>
+            <DrawerItemList
+                {...props}
+            />
+            <DrawerItem
+                label="登出"
+                onPress={() => signOut()}
+            />
+            {/* <DrawerItem
+                label="Toggle drawer"
+                onPress={() => props.navigation.toggleDrawer()}
+            /> */}
+        </DrawerContentScrollView>
+    );
+}
 
 export default function App() {
     const [state, dispatch] = React.useReducer(
@@ -95,7 +119,10 @@ export default function App() {
     return (
         <AuthContext.Provider value={authContext}>
             <NavigationContainer>
-                <Stack.Navigator>
+                <Drawer.Navigator
+                    useLegacyImplementation
+                    drawerContent={(props) => <CustomDrawerContent {...props} />}
+                >
                     {!state.userToken ? (
                         <>
                             <Stack.Screen
@@ -133,20 +160,21 @@ export default function App() {
                             />
                         </>
                     ) : (
-                        <Stack.Screen
-                            name="Home"
-                            component={HomeScreen}
-                            options={{
-                                title: `Hello，${state.userNickname}`,
-                                // headerShown: false
-                                headerShadowVisible: false,
-                                headerTitleStyle: {
-                                    fontSize: 20
-                                },
-                            }}
-                        />
+                        <Drawer.Group>
+                            <Drawer.Screen
+                                name="Home"
+                                component={HomeScreen}
+                                options={{
+                                    title: `Hello，${state.userNickname}！`,
+                                    headerShadowVisible: false,
+                                    headerTitleStyle: {
+                                        fontSize: 20
+                                    },
+                                }}
+                            />
+                        </Drawer.Group>
                     )}
-                </Stack.Navigator>
+                </Drawer.Navigator>
             </NavigationContainer>
         </AuthContext.Provider>
     );
